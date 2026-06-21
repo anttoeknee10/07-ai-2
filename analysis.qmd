@@ -11,29 +11,41 @@ execute:
 suppressPackageStartupMessages(library(tidyverse))
 ```
 
-## Named Storms per Year
+## Storm Types per Year
 
-The plot below shows the number of unique named storms per year based on the `storms` dataset from the `dplyr` package.
+The plot below shows the count of each storm type per year (tropical depressions, tropical storms, and hurricanes) based on the `storms` dataset from the `dplyr` package.
 
 ```{r}
 #| label: plot-storms
-#| fig-cap: "Number of named storms per year from 1975 to the present."
+#| fig-cap: "Number of storms by type per year from 1975 to the present."
 storms %>%
-  distinct(year, name) %>%
-  count(year) %>%
-  ggplot(aes(x = year, y = n)) +
-  geom_line(color = "#0073C2", linewidth = 1) +
-  geom_point(color = "#EFC000", size = 2) +
+  filter(status %in% c("tropical depression", "tropical storm", "hurricane")) %>%
+  mutate(status = factor(status, levels = c("tropical depression", "tropical storm", "hurricane"))) %>%
+  distinct(year, name, status) %>%
+  count(year, status) %>%
+  complete(year, status, fill = list(n = 0)) %>%
+  ggplot(aes(x = year, y = n, fill = status)) +
+  geom_area(alpha = 0.85, color = "white", linewidth = 0.2) +
+  scale_fill_manual(
+    values = c(
+      "tropical depression" = "#90e0ef", # light blue
+      "tropical storm" = "#f4a261",      # orange
+      "hurricane" = "#9b2226"             # dark red
+    ),
+    labels = c("Tropical Depression", "Tropical Storm", "Hurricane")
+  ) +
   labs(
-    title = "Named Storms Per Year",
-    subtitle = "Analysis of historical storm records",
+    title = "Storm Counts by Type Per Year",
+    subtitle = "Historical trends of tropical depressions, tropical storms, and hurricanes",
     x = "Year",
-    y = "Storm Count"
+    y = "Storm Count",
+    fill = "Storm Status"
   ) +
   theme_minimal(base_size = 14) +
   theme(
     plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
     plot.subtitle = element_text(face = "italic", size = 12, hjust = 0.5, color = "grey40"),
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom"
   )
 ```
