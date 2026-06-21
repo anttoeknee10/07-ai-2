@@ -1,0 +1,14 @@
+# Quarto Cache and Build Directories
+.quarto/
+*_cache/
+*_files/
+_freeze/
+_site/
+
+# R project files
+.Rhistory
+.RData
+.Rproj.user/
+
+# Ensure HTML files are tracked (do not ignore .html)
+# (This file intentionally avoids ignoring *.html)
